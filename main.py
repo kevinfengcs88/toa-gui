@@ -1,7 +1,8 @@
 import customtkinter
 from invocation import Invocation
+import all_invocations
 
-class InvocationsFrame(customtkinter.CTkFrame):
+class InvocationsFrame(customtkinter.CTkScrollableFrame):
     def __init__(self, master, invocations):
         super().__init__(master)
         self.invocation_checkboxes = []
@@ -24,21 +25,18 @@ class App(customtkinter.CTk):
         super().__init__()
 
         self.title("my app")
-        self.geometry("400x180")
+        self.geometry("800x600")
         self.grid_columnconfigure((0, 1), weight=1)
         self.grid_rowconfigure(0, weight=1)
 
-        invocations = [
-            Invocation("Need Some Help?", "The quantity of items offered by the Helpful Spirit will be reduced to 66%, with a minimum of one supply of that type.", 15, "Helpful Spirit"),
-            Invocation("On a Diet", "Players can no longer eat food within the raid, though potions that restore health (such as Saradomin brews) can still be used.", 15, "Restoration"),
-            Invocation("Mind the Gap!", "When Ba-Ba knocks back the player to the bottom of the room at 66% and 33% health, players will fall into the pit and die, unless they stand at the northern/southern sides of the room.", 10, "Ba-Ba")
-        ]
-
-        self.invocation_frame = InvocationsFrame(self, invocations)
+        self.invocation_frame = InvocationsFrame(self, all_invocations.all_invocations.values())
         self.invocation_frame.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="nsew")
 
-        self.button = customtkinter.CTkButton(self, text="my button", command=self.button_callback)
-        self.button.grid(row=1, column=0, padx=10, pady=10, sticky="ew", columnspan=1)
+        self.raidlevel = customtkinter.CTkLabel(self, text="0", fg_color="transparent", font=("Sans Serif", 20))
+        self.raidlevel.grid(row=0, column=1, padx=10, pady=(10, 0), sticky="nsew")
+
+        self.button = customtkinter.CTkButton(self, text="Print Active Invocations", command=self.button_callback)
+        self.button.grid(row=1, column=0, padx=10, pady=10, sticky="ew", columnspan=2)
 
     def button_callback(self):
         print("Active invocations are:", self.invocation_frame.get())
