@@ -2,13 +2,23 @@ import customtkinter
 from invocation import Invocation
 import all_invocations
 
+class InvocationErrorWindow(customtkinter.CTkToplevel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.title("Invocation error")
+        self.geometry("400x300")
+
+        self.label = customtkinter.CTkLabel(self, text="That combination of invocations is not allowed.")
+        self.label.pack(padx=20, pady=20)
+
 class InvocationsFrame(customtkinter.CTkScrollableFrame):
     def __init__(self, master, invocations):
         super().__init__(master)
         self.invocation_checkboxes = []
 
         for index, invocation in enumerate(invocations):
-            invocation_checkbox = customtkinter.CTkCheckBox(self, text=invocation.get_name(), command=master.update_raid_level)
+            invocation_checkbox = customtkinter.CTkCheckBox(self, text=invocation.get_name())
+            invocation_checkbox.configure(command=lambda checkbox=invocation_checkbox: master.update_raid_level(checkbox))
             invocation_checkbox.grid(row=index, column=0, padx=10, pady=(10, 0), sticky="w")
             self.invocation_checkboxes.append(invocation_checkbox)
 
@@ -51,17 +61,38 @@ class App(customtkinter.CTk):
         self.raid_level_progress_bar.set(0)
         self.raid_level_progress_bar.grid(row=1, column=0, padx=10, pady=(10, 0), sticky="ew")
 
+        self.invocation_error_window = None
 
-    def update_raid_level(self):
+
+    def focus_on_invocation_error_window(self):
+        self.invocation_error_window.focus()
+
+
+    def update_raid_level(self, last_invocation):
+        print(last_invocation.cget("text"))
+        if last_invocation.get() == 1:
+            print("just turned on")
+        elif last_invocation.get() == 0:
+            print("just turned OFF")
         active_invocations = self.invocation_frame.get()
-        print("Active invocations are:", active_invocations)
-        self.raid_level = 0
-        # this can be made more efficient by just adding or subtracting the one that was just checked
-        # is that desirable with the invocation frame only having access to master though?
-        for invocation in active_invocations:
-            self.raid_level += all_invocations.all_invocations[invocation].get_points()
+        # here check if last_invocation is in violation with the active_invocations
+        # if so, then disable it and open the error window
+
+        last_invocation_points = all_invocations.all_invocations[last_invocation.cget("text")].get_points()
+        if last_invocation.get() == 1:
+            self.raid_level += last_invocation_points
+        else:
+            self.raid_level -= last_invocation_points
+
         self.raid_level_label.configure(text=str(self.raid_level))
         if self.raid_level < 150:
+            #####
+            # if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
+            #     self.invocation_error_window = InvocationErrorWindow(self)
+            #     self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
+            # else:
+            #     self.invocation_error_window.focus()
+            #####
             self.raid_level_label.configure(text_color="yellow")
             self.raid_level_progress_bar.configure(progress_color="yellow")
         elif self.raid_level >= 150 and self.raid_level < 300:
