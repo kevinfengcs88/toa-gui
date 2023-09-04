@@ -2,8 +2,6 @@ import customtkinter
 from invocation import Invocation
 import all_invocations
 
-global_raid_level = 0
-
 class InvocationsFrame(customtkinter.CTkScrollableFrame):
     def __init__(self, master, invocations):
         super().__init__(master)
@@ -31,20 +29,30 @@ class App(customtkinter.CTk):
         self.grid_columnconfigure((0, 1), weight=1)
         self.grid_rowconfigure(0, weight=1)
 
+        self.raid_level = 0
+
         self.invocation_frame = InvocationsFrame(self, all_invocations.all_invocations.values())
         self.invocation_frame.grid(row=0, column=0, padx=10, pady=(10, 10), sticky="nsew")
 
-        self.raid_level_label = customtkinter.CTkLabel(self, text="0", fg_color="transparent", font=("Sans Serif", 20))
+        self.raid_level_label = customtkinter.CTkLabel(self, text="0", fg_color="transparent", text_color="yellow", font=("Sans Serif", 20))
         self.raid_level_label.grid(row=0, column=1, padx=10, pady=(10, 0), sticky="nsew")
 
 
     def update_raid_level(self):
         active_invocations = self.invocation_frame.get()
         print("Active invocations are:", active_invocations)
-        global_raid_level = 0
+        self.raid_level = 0
+        # this can be made more efficient by just adding or subtracting the one that was just checked
+        # is that desirable with the invocation frame only having access to master though?
         for invocation in active_invocations:
-            global_raid_level += all_invocations.all_invocations[invocation].get_points()
-        self.raid_level_label.configure(text=str(global_raid_level))
+            self.raid_level += all_invocations.all_invocations[invocation].get_points()
+        self.raid_level_label.configure(text=str(self.raid_level))
+        if self.raid_level < 150:
+            self.raid_level_label.configure(text_color="yellow")
+        elif self.raid_level >= 150 and self.raid_level < 300:
+            self.raid_level_label.configure(text_color="blue")
+        elif self.raid_level >= 300:
+            self.raid_level_label.configure(text_color="red")
 
 
 app = App()
