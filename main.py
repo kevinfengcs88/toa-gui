@@ -2,6 +2,7 @@ import customtkinter
 from invocation import Invocation
 import all_invocations
 
+
 class InvocationErrorWindow(customtkinter.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -10,6 +11,7 @@ class InvocationErrorWindow(customtkinter.CTkToplevel):
 
         self.label = customtkinter.CTkLabel(self, text="That combination of invocations is not allowed.")
         self.label.pack(padx=20, pady=20)
+
 
 class InvocationsFrame(customtkinter.CTkScrollableFrame):
     def __init__(self, master, invocations):
@@ -21,6 +23,7 @@ class InvocationsFrame(customtkinter.CTkScrollableFrame):
             invocation_checkbox.configure(command=lambda checkbox=invocation_checkbox: master.update_raid_level(checkbox))
             invocation_checkbox.grid(row=index, column=0, padx=10, pady=(10, 0), sticky="w")
             self.invocation_checkboxes.append(invocation_checkbox)
+
 
     def get(self):
         active_invocations = []
@@ -45,6 +48,10 @@ class App(customtkinter.CTk):
         self.grid_rowconfigure((0), weight=1)
 
         self.raid_level = 0
+        self.attempts_count = 0
+        self.time_limit_count = 0
+        self.helpful_spirit_count = 0
+        self.path_level_count = 0
 
         self.invocation_frame = InvocationsFrame(self, all_invocations.all_invocations.values())
         self.invocation_frame.grid(row=0, column=0, padx=10, pady=(10, 10), sticky="nsew")
@@ -69,14 +76,77 @@ class App(customtkinter.CTk):
 
 
     def update_raid_level(self, last_invocation):
-        print(last_invocation.cget("text"))
-        if last_invocation.get() == 1:
-            print("just turned on")
-        elif last_invocation.get() == 0:
-            print("just turned OFF")
+        if all_invocations.all_invocations[last_invocation.cget("text")].get_category() == "Attempts":
+            if last_invocation.get() == 1:
+                self.attempts_count += 1
+                if self.attempts_count > 1:
+                    self.attempts_count -= 1
+                    last_invocation.deselect()
+                    if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
+                        self.invocation_error_window = InvocationErrorWindow(self)
+                        self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
+                    else:
+                        self.invocation_error_window.focus()
+                    return
+            else:
+                self.attempts_count -= 1
+        elif all_invocations.all_invocations[last_invocation.cget("text")].get_category() == "Time Limit":
+            if last_invocation.get() == 1:
+                self.time_limit_count += 1
+                if self.time_limit_count > 1:
+                    self.time_limit_count -= 1
+                    last_invocation.deselect()
+                    if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
+                        self.invocation_error_window = InvocationErrorWindow(self)
+                        self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
+                    else:
+                        self.invocation_error_window.focus()
+                    return
+            else:
+                self.time_limit_count -= 1
+        elif all_invocations.all_invocations[last_invocation.cget("text")].get_category() == "Helpful Spirit":
+            if last_invocation.get() == 1:
+                self.helpful_spirit_count += 1
+                if self.helpful_spirit_count > 1:
+                    self.helpful_spirit_count -= 1
+                    last_invocation.deselect()
+                    if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
+                        self.invocation_error_window = InvocationErrorWindow(self)
+                        self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
+                    else:
+                        self.invocation_error_window.focus()
+                    return
+            else:
+                self.helpful_spirit_count -= 1
+        elif all_invocations.all_invocations[last_invocation.cget("text")].get_category() == "Path Level":
+            if last_invocation.get() == 1:
+                self.path_level_count += 1
+                if self.path_level_count > 1:
+                    self.path_level_count -= 1
+                    last_invocation.deselect()
+                    if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
+                        self.invocation_error_window = InvocationErrorWindow(self)
+                        self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
+                    else:
+                        self.invocation_error_window.focus()
+                    return
+            else:
+                self.path_level_count -= 1
+        else:
+            pass
+
+        print(self.attempts_count)
+        print(self.time_limit_count)
+        print(self.helpful_spirit_count)
+        print(self.path_level_count)
+        print("------------------------------------")
+
+
         active_invocations = self.invocation_frame.get()
         # here check if last_invocation is in violation with the active_invocations
         # if so, then disable it and open the error window
+        # not just "doubles" also need to account for invocations like overclocked 2 requiring overclocked, or insanity requiring overclocked 2
+        # just let the user turn insanity on, automatically turning on the other 2? will have to adjust logic with incremental raid level calculation
 
         last_invocation_points = all_invocations.all_invocations[last_invocation.cget("text")].get_points()
         if last_invocation.get() == 1:
@@ -87,11 +157,6 @@ class App(customtkinter.CTk):
         self.raid_level_label.configure(text=str(self.raid_level))
         if self.raid_level < 150:
             #####
-            # if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
-            #     self.invocation_error_window = InvocationErrorWindow(self)
-            #     self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
-            # else:
-            #     self.invocation_error_window.focus()
             #####
             self.raid_level_label.configure(text_color="yellow")
             self.raid_level_progress_bar.configure(progress_color="yellow")
