@@ -74,8 +74,66 @@ class App(customtkinter.CTk):
     def focus_on_invocation_error_window(self):
         self.invocation_error_window.focus()
 
+    def check_invocation_count(self, active_invocations, last_invocation, category):
+        attribute_count = self.get_attribute(category)
+        if last_invocation.get() == 1:
+            self.set_attribute(category, attribute_count)
+            if attribute_count > 1:
+                self.set_attribute(attribute_count - 1)
+                last_invocation.deselect()
+                if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
+                    self.invocation_error_window = InvocationErrorWindow(self)
+                    self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
+                else:
+                    self.invocation_error_window.focus()
+                # this only returns inside of this function and not update_raid_level
+                return True
+        else:
+            self.set_attribute(category, attribute_count - 1)
+        return False
+
+
+    def get_attribute(self, category):
+        attribute = category.lower().replace(" ", "_") + "_count"
+        return getattr(self, attribute)
+
+    
+    def set_attribute(self, category, new_value):
+        attribute = category.lower().replace(" ", "_") + "_count"
+        setattr(self, attribute, new_value)
+
 
     def update_raid_level(self, last_invocation):
+        active_invocations = self.invocation_frame.get()
+
+        # not that this is working, but just create a list and then loop through it
+
+        # if all_invocations.all_invocations[last_invocation.cget("text")].get_category() == "Attempts":
+        #     terminate = self.check_invocation_count(active_invocations, last_invocation, "Attempts")
+        #     if terminate:
+        #         return
+        #     else:
+        #         pass
+        # elif all_invocations.all_invocations[last_invocation.cget("text")].get_category() == "Time Limit":
+        #     terminate = self.check_invocation_count(active_invocations, last_invocation, "Time Limit")
+        #     if terminate:
+        #         return
+        #     else:
+        #         pass
+        # elif all_invocations.all_invocations[last_invocation.cget("text")].get_category() == "Helpful Spirit":
+        #     terminate = self.check_invocation_count(active_invocations, last_invocation, "Helpful Spirit")
+        #     if terminate:
+        #         return
+        #     else:
+        #         pass
+        # elif all_invocations.all_invocations[last_invocation.cget("text")].get_category() == "Path Level":
+        #     terminate = self.check_invocation_count(active_invocations, last_invocation, "Path Level")
+        #     if terminate:
+        #         return
+        #     else:
+        #         pass
+
+
         if all_invocations.all_invocations[last_invocation.cget("text")].get_category() == "Attempts":
             if last_invocation.get() == 1:
                 self.attempts_count += 1
@@ -132,15 +190,54 @@ class App(customtkinter.CTk):
                     return
             else:
                 self.path_level_count -= 1
+
+
+        ##### BUGGGGGGGG
+        # enabling something like not just a head so the user CAN turn arterial spray on
+        # then removing not just a head, yet arterial spray remains on
+        # also you can't even turn off arterial spray once this edge case has occurred
+        # since you're still interacting with the same function
+        elif all_invocations.all_invocations[last_invocation.cget("text")].get_name() == "Arterial Spray" and "Not Just a Head" not in active_invocations:
+            last_invocation.deselect()
+            if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
+                self.invocation_error_window = InvocationErrorWindow(self)
+                self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
+            else:
+                self.invocation_error_window.focus()
+            return
+        elif all_invocations.all_invocations[last_invocation.cget("text")].get_name() == "Blood Thinners" and "Not Just a Head" not in active_invocations:
+            last_invocation.deselect()
+            if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
+                self.invocation_error_window = InvocationErrorWindow(self)
+                self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
+            else:
+                self.invocation_error_window.focus()
+            return
+        elif all_invocations.all_invocations[last_invocation.cget("text")].get_name() == "Overclocked 2" and "Overclocked" not in active_invocations:
+            last_invocation.deselect()
+            if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
+                self.invocation_error_window = InvocationErrorWindow(self)
+                self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
+            else:
+                self.invocation_error_window.focus()
+            return
+        elif all_invocations.all_invocations[last_invocation.cget("text")].get_name() == "Insanity" and "Overclocked 2" not in active_invocations:
+            last_invocation.deselect()
+            if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
+                self.invocation_error_window = InvocationErrorWindow(self)
+                self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
+            else:
+                self.invocation_error_window.focus()
+            return
         else:
             pass
+        
 
         print(self.attempts_count)
         print(self.time_limit_count)
         print(self.helpful_spirit_count)
         print(self.path_level_count)
         print("------------------------------------")
-
 
         active_invocations = self.invocation_frame.get()
         # here check if last_invocation is in violation with the active_invocations
