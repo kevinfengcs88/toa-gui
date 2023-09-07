@@ -86,7 +86,6 @@ class App(customtkinter.CTk):
                     self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
                 else:
                     self.invocation_error_window.focus()
-                # this only returns inside of this function and not update_raid_level
                 return True
         else:
             self.set_attribute(category, attribute_count - 1)
@@ -192,7 +191,7 @@ class App(customtkinter.CTk):
                 self.path_level_count -= 1
 
 
-        ##### BUGGGGGGGG
+        # BUG
         # enabling something like not just a head so the user CAN turn arterial spray on
         # then removing not just a head, yet arterial spray remains on
         # also you can't even turn off arterial spray once this edge case has occurred
@@ -240,11 +239,6 @@ class App(customtkinter.CTk):
         print("------------------------------------")
 
         active_invocations = self.invocation_frame.get()
-        # here check if last_invocation is in violation with the active_invocations
-        # if so, then disable it and open the error window
-        # not just "doubles" also need to account for invocations like overclocked 2 requiring overclocked, or insanity requiring overclocked 2
-        # just let the user turn insanity on, automatically turning on the other 2? will have to adjust logic with incremental raid level calculation
-
         last_invocation_points = all_invocations.all_invocations[last_invocation.cget("text")].get_points()
         if last_invocation.get() == 1:
             self.raid_level += last_invocation_points
@@ -253,8 +247,6 @@ class App(customtkinter.CTk):
 
         self.raid_level_label.configure(text=str(self.raid_level))
         if self.raid_level < 150:
-            #####
-            #####
             self.raid_level_label.configure(text_color="yellow")
             self.raid_level_progress_bar.configure(progress_color="yellow")
         elif self.raid_level >= 150 and self.raid_level < 300:
@@ -264,9 +256,7 @@ class App(customtkinter.CTk):
             self.raid_level_label.configure(text_color="red")
             self.raid_level_progress_bar.configure(progress_color="red")
 
-        # update the progress bar
         self.raid_level_progress_bar.set(self.raid_level/600)
-
 
 app = App()
 app.mainloop()
