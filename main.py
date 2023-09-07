@@ -2,6 +2,9 @@ import customtkinter
 from invocation import Invocation
 import all_invocations
 
+app_width = 800
+app_height = 600
+
 
 class InvocationErrorWindow(customtkinter.CTkToplevel):
     def __init__(self, *args, **kwargs):
@@ -43,7 +46,7 @@ class App(customtkinter.CTk):
         super().__init__()
 
         self.title("my app")
-        self.geometry("800x600")
+        self.geometry(f"{app_width}x{app_height}")
         self.grid_columnconfigure((0, 1), weight=1)
         self.grid_rowconfigure((0), weight=1)
 
@@ -141,9 +144,13 @@ class App(customtkinter.CTk):
                     last_invocation.deselect()
                     if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
                         self.invocation_error_window = InvocationErrorWindow(self)
+                        self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
                         self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
                     else:
-                        self.invocation_error_window.focus()
+                        self.invocation_error_window.destroy()
+                        self.invocation_error_window = InvocationErrorWindow(self)
+                        self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
+                        self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
                     return
             else:
                 self.attempts_count -= 1
@@ -155,9 +162,13 @@ class App(customtkinter.CTk):
                     last_invocation.deselect()
                     if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
                         self.invocation_error_window = InvocationErrorWindow(self)
+                        self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
                         self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
                     else:
-                        self.invocation_error_window.focus()
+                        self.invocation_error_window.destroy()
+                        self.invocation_error_window = InvocationErrorWindow(self)
+                        self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
+                        self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
                     return
             else:
                 self.time_limit_count -= 1
@@ -169,9 +180,13 @@ class App(customtkinter.CTk):
                     last_invocation.deselect()
                     if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
                         self.invocation_error_window = InvocationErrorWindow(self)
+                        self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
                         self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
                     else:
-                        self.invocation_error_window.focus()
+                        self.invocation_error_window.destroy()
+                        self.invocation_error_window = InvocationErrorWindow(self)
+                        self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
+                        self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
                     return
             else:
                 self.helpful_spirit_count -= 1
@@ -183,9 +198,13 @@ class App(customtkinter.CTk):
                     last_invocation.deselect()
                     if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
                         self.invocation_error_window = InvocationErrorWindow(self)
+                        self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
                         self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
                     else:
-                        self.invocation_error_window.focus()
+                        self.invocation_error_window.destroy()
+                        self.invocation_error_window = InvocationErrorWindow(self)
+                        self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
+                        self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
                     return
             else:
                 self.path_level_count -= 1
