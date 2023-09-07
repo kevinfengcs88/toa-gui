@@ -1,6 +1,7 @@
 import customtkinter
 from invocation import Invocation
 import all_invocations
+from CTkToolTip import *
 
 app_width = 800
 app_height = 600
@@ -25,6 +26,7 @@ class InvocationsFrame(customtkinter.CTkScrollableFrame):
             invocation_checkbox = customtkinter.CTkCheckBox(self, text=invocation.get_name())
             invocation_checkbox.configure(command=lambda checkbox=invocation_checkbox: master.update_raid_level(checkbox))
             invocation_checkbox.grid(row=index, column=0, padx=10, pady=(10, 0), sticky="w")
+            invocation_checkbox_tooltip = CTkToolTip(invocation_checkbox, message=invocation.get_description(), wraplength=app_width/2, justify="left", font=("Sans Serif", 20))
             self.invocation_checkboxes.append(invocation_checkbox)
 
 
