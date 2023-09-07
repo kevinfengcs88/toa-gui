@@ -1,7 +1,10 @@
 import customtkinter
+from CTkToolTip import *
+# from pydub import AudioSegment
+# from pydub.playback import play
+import pygame.mixer
 from invocation import Invocation
 import all_invocations
-from CTkToolTip import *
 
 app_width = 800
 app_height = 600
@@ -108,6 +111,8 @@ class App(customtkinter.CTk):
 
 
     def update_raid_level(self, last_invocation):
+        # sound = AudioSegment.from_mp3("sfx/invocationon.mp3")
+        # play(sound)
         active_invocations = self.invocation_frame.get()
 
         # not that this is working, but just create a list and then loop through it
@@ -259,12 +264,18 @@ class App(customtkinter.CTk):
         print(self.path_level_count)
         print("------------------------------------")
 
+        pygame.mixer.init()
+
         active_invocations = self.invocation_frame.get()
         last_invocation_points = all_invocations.all_invocations[last_invocation.cget("text")].get_points()
         if last_invocation.get() == 1:
             self.raid_level += last_invocation_points
+            pygame.mixer.music.load("sfx/invocationon.mp3")
+            pygame.mixer.music.play()
         else:
             self.raid_level -= last_invocation_points
+            pygame.mixer.music.load("sfx/invocationoff.mp3")
+            pygame.mixer.music.play()
 
         self.raid_level_label.configure(text=str(self.raid_level))
         if self.raid_level < 150:
@@ -279,5 +290,8 @@ class App(customtkinter.CTk):
 
         self.raid_level_progress_bar.set(self.raid_level/600)
 
-app = App()
-app.mainloop()
+try:
+    app = App()
+    app.mainloop()
+except Exception as e:
+    print(e)

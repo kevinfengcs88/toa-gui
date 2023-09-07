@@ -4,8 +4,22 @@ Graphical user interface built with [CustomTkinter](https://github.com/TomSchima
 
 ### TODO
 
-- Add sound effects for turning invocations on and off
 - Add images to each invocation for easier category identification
 - Add ability to save presets
 - Show a rewards window corresponding to the rare drops that players could receive at that raid level
 - Prevent user from breaking invocation rules (like having two "Attempts" category invocations active at the same time)
+- Set up a GitHub Actions CI/CD pipeline for dockerizing the app, running automated tests, etc.
+- Allow user to change an invocation category without manually turning off the already active one (will also require invocationchange.mp3 sound effect)
+
+### Requirements
+```
+pip install CTkToolTip
+```
+
+```
+pip install customtkinter
+```
+
+```
+pip install pygame
+```
