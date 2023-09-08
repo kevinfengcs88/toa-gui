@@ -82,32 +82,6 @@ class App(customtkinter.CTk):
     def focus_on_invocation_error_window(self):
         self.invocation_error_window.focus()
 
-    def check_invocation_count(self, active_invocations, last_invocation_checkbox, category):
-        attribute_count = self.get_attribute(category)
-        if last_invocation_checkbox.get() == 1:
-            self.set_attribute(category, attribute_count)
-            if attribute_count > 1:
-                self.set_attribute(attribute_count - 1)
-                last_invocation_checkbox.deselect()
-                if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
-                    self.invocation_error_window = InvocationErrorWindow(self)
-                    self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
-                else:
-                    self.invocation_error_window.focus()
-                return True
-        else:
-            self.set_attribute(category, attribute_count - 1)
-        return False
-
-
-    def get_attribute(self, category):
-        attribute = category.lower().replace(" ", "_") + "_count"
-        return getattr(self, attribute)
-
-    
-    def set_attribute(self, category, new_value):
-        attribute = category.lower().replace(" ", "_") + "_count"
-        setattr(self, attribute, new_value)
 
 
     def invalid_invocation(self, last_invocation_checkbox, deselect_flag):
@@ -126,50 +100,42 @@ class App(customtkinter.CTk):
             self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
 
 
+    def get_attribute(self, category):
+        attribute = category.lower().replace(" ", "_") + "_count"
+        return getattr(self, attribute)
+
+    
+    def set_attribute(self, category, new_value):
+        attribute = category.lower().replace(" ", "_") + "_count"
+        setattr(self, attribute, new_value)
+
+
+    def check_invocation_count(self, active_invocations, last_invocation_checkbox, category):
+        if last_invocation_checkbox.get() == 1:
+            self.set_attribute(category, self.get_attribute(category) + 1)
+            if self.get_attribute(category) > 1:
+                self.set_attribute(category, self.get_attribute(category) - 1)
+                ###
+                self.invalid_invocation(last_invocation_checkbox, True)
+                return True
+                ###
+        else:
+            self.set_attribute(category, self.get_attribute(category) - 1)
+        return False
+        
+
     def update_raid_level(self, last_invocation_checkbox):
         active_invocations = self.invocation_frame.get()
         last_invocation = all_invocations.all_invocations[last_invocation_checkbox.cget("text")]
 
-
-        # maybe create a list of the 4 categories and loop through it
-        # requires a function which uses setattr and getattr
-
-        if last_invocation.get_category() == "Attempts":
-            if last_invocation_checkbox.get() == 1:
-                self.attempts_count += 1
-                if self.attempts_count > 1:
-                    self.attempts_count -= 1
-                    self.invalid_invocation(last_invocation_checkbox, True)
+        category_list = ["Attempts", "Time Limit", "Helpful Spirit", "Path Level"]
+        for c in category_list:
+            if last_invocation.get_category() == c:
+                terminate = self.check_invocation_count(active_invocations, last_invocation_checkbox, c)
+                if terminate:
                     return
-            else:
-                self.attempts_count -= 1
-        elif last_invocation.get_category() == "Time Limit":
-            if last_invocation_checkbox.get() == 1:
-                self.time_limit_count += 1
-                if self.time_limit_count > 1:
-                    self.time_limit_count -= 1
-                    self.invalid_invocation(last_invocation_checkbox, True)
-                    return
-            else:
-                self.time_limit_count -= 1
-        elif last_invocation.get_category() == "Helpful Spirit":
-            if last_invocation_checkbox.get() == 1:
-                self.helpful_spirit_count += 1
-                if self.helpful_spirit_count > 1:
-                    self.helpful_spirit_count -= 1
-                    self.invalid_invocation(last_invocation_checkbox, True)
-                    return
-            else:
-                self.helpful_spirit_count -= 1
-        elif last_invocation.get_category() == "Path Level":
-            if last_invocation_checkbox.get() == 1:
-                self.path_level_count += 1
-                if self.path_level_count > 1:
-                    self.path_level_count -= 1
-                    self.invalid_invocation(last_invocation_checkbox, True)
-                    return
-            else:
-                self.path_level_count -= 1
+                else:
+                    pass
 
         zebak_check_1 = (last_invocation.get_name() == "Arterial Spray" or last_invocation.get_name() == "Blood Thinners") and "Not Just a Head" not in active_invocations
         zebak_check_2 = last_invocation.get_name() == "Not Just a Head" and ("Arterial Spray" in active_invocations or "Blood Thinners" in active_invocations)
