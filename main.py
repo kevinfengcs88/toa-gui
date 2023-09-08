@@ -1,5 +1,7 @@
 import customtkinter
 from CTkToolTip import *
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame.mixer
 from invocation import Invocation
 import all_invocations
@@ -108,55 +110,36 @@ class App(customtkinter.CTk):
         setattr(self, attribute, new_value)
 
 
+    def invalid_invocation(self, last_invocation_checkbox, deselect_flag):
+        if deselect_flag:
+            last_invocation_checkbox.deselect()
+        else:
+            last_invocation_checkbox.select()
+        if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
+            self.invocation_error_window = InvocationErrorWindow(self)
+            self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
+            self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
+        else:
+            self.invocation_error_window.destroy()
+            self.invocation_error_window = InvocationErrorWindow(self)
+            self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
+            self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
+
+
     def update_raid_level(self, last_invocation_checkbox):
-        # sound = AudioSegment.from_mp3("sfx/invocationon.mp3")
-        # play(sound)
         active_invocations = self.invocation_frame.get()
         last_invocation = all_invocations.all_invocations[last_invocation_checkbox.cget("text")]
 
-        # not that this is working, but just create a list and then loop through it
 
-        # if all_invocations.all_invocations[last_invocation.cget("text")].get_category() == "Attempts":
-        #     terminate = self.check_invocation_count(active_invocations, last_invocation, "Attempts")
-        #     if terminate:
-        #         return
-        #     else:
-        #         pass
-        # elif all_invocations.all_invocations[last_invocation.cget("text")].get_category() == "Time Limit":
-        #     terminate = self.check_invocation_count(active_invocations, last_invocation, "Time Limit")
-        #     if terminate:
-        #         return
-        #     else:
-        #         pass
-        # elif all_invocations.all_invocations[last_invocation.cget("text")].get_category() == "Helpful Spirit":
-        #     terminate = self.check_invocation_count(active_invocations, last_invocation, "Helpful Spirit")
-        #     if terminate:
-        #         return
-        #     else:
-        #         pass
-        # elif all_invocations.all_invocations[last_invocation.cget("text")].get_category() == "Path Level":
-        #     terminate = self.check_invocation_count(active_invocations, last_invocation, "Path Level")
-        #     if terminate:
-        #         return
-        #     else:
-        #         pass
-
+        # maybe create a list of the 4 categories and loop through it
+        # requires a function which uses setattr and getattr
 
         if last_invocation.get_category() == "Attempts":
             if last_invocation_checkbox.get() == 1:
                 self.attempts_count += 1
                 if self.attempts_count > 1:
                     self.attempts_count -= 1
-                    last_invocation_checkbox.deselect()
-                    if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
-                        self.invocation_error_window = InvocationErrorWindow(self)
-                        self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
-                        self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
-                    else:
-                        self.invocation_error_window.destroy()
-                        self.invocation_error_window = InvocationErrorWindow(self)
-                        self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
-                        self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
+                    self.invalid_invocation(last_invocation_checkbox, True)
                     return
             else:
                 self.attempts_count -= 1
@@ -165,16 +148,7 @@ class App(customtkinter.CTk):
                 self.time_limit_count += 1
                 if self.time_limit_count > 1:
                     self.time_limit_count -= 1
-                    last_invocation_checkbox.deselect()
-                    if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
-                        self.invocation_error_window = InvocationErrorWindow(self)
-                        self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
-                        self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
-                    else:
-                        self.invocation_error_window.destroy()
-                        self.invocation_error_window = InvocationErrorWindow(self)
-                        self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
-                        self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
+                    self.invalid_invocation(last_invocation_checkbox, True)
                     return
             else:
                 self.time_limit_count -= 1
@@ -183,16 +157,7 @@ class App(customtkinter.CTk):
                 self.helpful_spirit_count += 1
                 if self.helpful_spirit_count > 1:
                     self.helpful_spirit_count -= 1
-                    last_invocation_checkbox.deselect()
-                    if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
-                        self.invocation_error_window = InvocationErrorWindow(self)
-                        self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
-                        self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
-                    else:
-                        self.invocation_error_window.destroy()
-                        self.invocation_error_window = InvocationErrorWindow(self)
-                        self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
-                        self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
+                    self.invalid_invocation(last_invocation_checkbox, True)
                     return
             else:
                 self.helpful_spirit_count -= 1
@@ -201,26 +166,10 @@ class App(customtkinter.CTk):
                 self.path_level_count += 1
                 if self.path_level_count > 1:
                     self.path_level_count -= 1
-                    last_invocation_checkbox.deselect()
-                    if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
-                        self.invocation_error_window = InvocationErrorWindow(self)
-                        self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
-                        self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
-                    else:
-                        self.invocation_error_window.destroy()
-                        self.invocation_error_window = InvocationErrorWindow(self)
-                        self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
-                        self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
+                    self.invalid_invocation(last_invocation_checkbox, True)
                     return
             else:
                 self.path_level_count -= 1
-
-
-        # BUG
-        # enabling something like not just a head so the user CAN turn arterial spray on
-        # then removing not just a head, yet arterial spray remains on
-        # also you can't even turn off arterial spray once this edge case has occurred
-        # since you're still interacting with the same function
 
         zebak_check_1 = (last_invocation.get_name() == "Arterial Spray" or last_invocation.get_name() == "Blood Thinners") and "Not Just a Head" not in active_invocations
         zebak_check_2 = last_invocation.get_name() == "Not Just a Head" and ("Arterial Spray" in active_invocations or "Blood Thinners" in active_invocations)
@@ -231,62 +180,17 @@ class App(customtkinter.CTk):
         wardens_check_4 = last_invocation.get_name() == "Overclocked 2" and "Insanity" in active_invocations
 
         if zebak_check_1:
-            last_invocation_checkbox.deselect()
-            if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
-                self.invocation_error_window = InvocationErrorWindow(self)
-                self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
-                self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
-            else:
-                self.invocation_error_window.destroy()
-                self.invocation_error_window = InvocationErrorWindow(self)
-                self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
-                self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
+            self.invalid_invocation(last_invocation_checkbox, True)
             return
         elif zebak_check_2:
-            last_invocation_checkbox.select()
-            if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
-                self.invocation_error_window = InvocationErrorWindow(self)
-                self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
-                self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
-            else:
-                self.invocation_error_window.destroy()
-                self.invocation_error_window = InvocationErrorWindow(self)
-                self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
-                self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
+            self.invalid_invocation(last_invocation_checkbox, False)
             return
         elif wardens_check_1 or wardens_check_2:
-            last_invocation_checkbox.deselect()
-            if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
-                self.invocation_error_window = InvocationErrorWindow(self)
-                self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
-                self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
-            else:
-                self.invocation_error_window.destroy()
-                self.invocation_error_window = InvocationErrorWindow(self)
-                self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
-                self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
+            self.invalid_invocation(last_invocation_checkbox, True)
             return
         elif wardens_check_3 or wardens_check_4:
-            last_invocation_checkbox.select()
-            if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
-                self.invocation_error_window = InvocationErrorWindow(self)
-                self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
-                self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
-            else:
-                self.invocation_error_window.destroy()
-                self.invocation_error_window = InvocationErrorWindow(self)
-                self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
-                self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
+            self.invalid_invocation(last_invocation_checkbox, False)
             return
-        else:
-            pass
-        
-
-        print(self.attempts_count)
-        print(self.time_limit_count)
-        print(self.helpful_spirit_count)
-        print(self.path_level_count)
-        print("------------------------------------")
 
         pygame.mixer.init()
 
