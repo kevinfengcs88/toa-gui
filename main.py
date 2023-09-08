@@ -11,13 +11,20 @@ app_height = 600
 
 
 class InvocationErrorWindow(customtkinter.CTkToplevel):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, master, error_message):
+        super().__init__(master)
         self.title("Invocation error")
-        self.geometry("400x300")
+        self.geometry("69x69") # default geometry, although it's manually set
 
-        self.label = customtkinter.CTkLabel(self, text="That combination of invocations is not allowed.")
+        self.label = customtkinter.CTkLabel(self)
         self.label.pack(padx=20, pady=20)
+
+        self.change_error_message(error_message)
+        self.geometry("%dx%d+%d+%d" % (600, 100, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
+        self.after(10, master.focus_on_invocation_error_window)
+
+    def change_error_message(self, message):
+        self.label.configure(text=message)
 
 
 class InvocationsFrame(customtkinter.CTkScrollableFrame):
@@ -83,21 +90,23 @@ class App(customtkinter.CTk):
         self.invocation_error_window.focus()
 
 
-
-    def invalid_invocation(self, last_invocation_checkbox, deselect_flag):
+    def invalid_invocation(self, last_invocation_checkbox, deselect_flag, reason):
         if deselect_flag:
             last_invocation_checkbox.deselect()
         else:
             last_invocation_checkbox.select()
+        error_message = ""
+        if reason != "Zebak" and reason != "Wardens":
+            error_message = f"Only 1 invocation in the {reason} category can be active."
+        elif reason == "Zebak":
+            error_message = "Not Just a Head is required for Arterial Spray and Blood Thinners."
+        elif reason == "Wardens":
+            error_message = "Overclocked is required for Overclocked 2 and Overclocked 2 is required for Insanity."
         if self.invocation_error_window is None or not self.invocation_error_window.winfo_exists():
-            self.invocation_error_window = InvocationErrorWindow(self)
-            self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
-            self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
+            self.invocation_error_window = InvocationErrorWindow(self, error_message)
         else:
             self.invocation_error_window.destroy()
-            self.invocation_error_window = InvocationErrorWindow(self)
-            self.invocation_error_window.geometry("%dx%d+%d+%d" % (480, 270, App.winfo_x(self) + app_width/4, App.winfo_y(self) + app_height/4))
-            self.invocation_error_window.after(10, self.focus_on_invocation_error_window)
+            self.invocation_error_window = InvocationErrorWindow(self, error_message)
 
 
     def get_attribute(self, category):
@@ -115,10 +124,8 @@ class App(customtkinter.CTk):
             self.set_attribute(category, self.get_attribute(category) + 1)
             if self.get_attribute(category) > 1:
                 self.set_attribute(category, self.get_attribute(category) - 1)
-                ###
-                self.invalid_invocation(last_invocation_checkbox, True)
+                self.invalid_invocation(last_invocation_checkbox, True, category)
                 return True
-                ###
         else:
             self.set_attribute(category, self.get_attribute(category) - 1)
         return False
@@ -146,16 +153,16 @@ class App(customtkinter.CTk):
         wardens_check_4 = last_invocation.get_name() == "Overclocked 2" and "Insanity" in active_invocations
 
         if zebak_check_1:
-            self.invalid_invocation(last_invocation_checkbox, True)
+            self.invalid_invocation(last_invocation_checkbox, True, "Zebak")
             return
         elif zebak_check_2:
-            self.invalid_invocation(last_invocation_checkbox, False)
+            self.invalid_invocation(last_invocation_checkbox, False, "Zebak")
             return
         elif wardens_check_1 or wardens_check_2:
-            self.invalid_invocation(last_invocation_checkbox, True)
+            self.invalid_invocation(last_invocation_checkbox, True, "Wardens")
             return
         elif wardens_check_3 or wardens_check_4:
-            self.invalid_invocation(last_invocation_checkbox, False)
+            self.invalid_invocation(last_invocation_checkbox, False, "Wardens")
             return
 
         pygame.mixer.init()
@@ -172,6 +179,7 @@ class App(customtkinter.CTk):
             pygame.mixer.music.play()
 
         self.raid_level_label.configure(text=str(self.raid_level))
+
         if self.raid_level < 150:
             self.raid_level_label.configure(text_color="yellow")
             self.raid_level_progress_bar.configure(progress_color="yellow")
