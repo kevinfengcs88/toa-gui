@@ -1,6 +1,6 @@
 import customtkinter
 from components.InvocationsFrame import InvocationsFrame
-from all_invocations import all_invocations
+from util.all_invocations import all_invocations
 from components.RaidLevelFrame import RaidLevelFrame
 from components.InvocationErrorWindow import InvocationErrorWindow
 import os

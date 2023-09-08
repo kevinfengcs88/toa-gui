@@ -1,5 +1,3 @@
-import customtkinter
-from invocation import Invocation
 from components.App import App
 
 app_width = 800

@@ -1,4 +1,4 @@
-from invocation import Invocation
+from util.Invocation import Invocation
 
 all_invocations = {
     "Try Again": Invocation("Try Again", "Players have ten attempts to complete a raid.", 5, "Attempts"),
