@@ -42,6 +42,21 @@ class App(customtkinter.CTk):
 
         self.invocation_error_window = None
 
+        pygame.mixer.init(44100, -16, 4)
+        self.bg_music = pygame.mixer.Sound("sfx\intothetombs.mp3")
+        self.ch1 = pygame.mixer.Channel(0)
+        self.ch1.set_volume(0.25)
+        self.ch2 = pygame.mixer.Channel(1)
+        self.ch3 = pygame.mixer.Channel(2)
+        self.ch1.play(self.bg_music)
+        # some_sound = pygame.mixer.Sound("sfx\invocationchange.mp3")
+        # some_sound2 = pygame.mixer.Sound("sfx\invocationoff.mp3")
+        # ch1 = pygame.mixer.Channel(0)
+        # ch2 = pygame.mixer.Channel(1)
+
+        # ch1.play(some_sound)
+        # ch2.play(some_sound2)
+
 
     def focus_on_invocation_error_window(self):
         self.invocation_error_window.focus()

@@ -9,6 +9,7 @@ Graphical user interface built with [CustomTkinter](https://github.com/TomSchima
 - Show a rewards window corresponding to the rare drops that players could receive at that raid level
 - Set up a GitHub Actions CI/CD pipeline for dockerizing the app, running automated tests, etc.
 - Allow user to change an invocation category without manually turning off the already active one (will also require `invocationchange.mp3` sound effect)
+- Add a slider to control music/sfx volume
 
 ### Requirements
 ```
